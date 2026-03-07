@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from src.constants import *
 
-
 @dataclass(frozen=True)
 class DataIngestionConfig:
     root_dir: Path
@@ -10,14 +9,12 @@ class DataIngestionConfig:
     local_data_file: Path
     unzip_dir: Path
 
-
 @dataclass(frozen=True)
 class DataValidationConfig:
     root_dir: Path
     STATUS_FILE: str
     unzip_data_dir: Path
     all_schema: dict
-
 
 @dataclass(frozen=True)
 class ModelTrainerConfig:
@@ -31,7 +28,6 @@ class ModelTrainerConfig:
     params_is_augmentation: bool
     params_image_size: list
 
-
 @dataclass(frozen=True)
 class ModelConfig:
     root_dir: Path
@@ -44,3 +40,4 @@ class ModelConfig:
     params_classes: int
     params_pooling: str
     params_activation: str
+    

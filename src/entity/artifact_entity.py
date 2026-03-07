@@ -1,12 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-
 @dataclass
 class DataIngestionArtifact:
     trained_file_path: Path
     test_file_path: Path
-
 
 @dataclass
 class DataValidationArtifact:
@@ -17,13 +15,11 @@ class DataValidationArtifact:
     invalid_test_file_path: Path
     drift_report_file_path: Path
 
-
 @dataclass
 class ModelTrainerArtifact:
     trained_model_file_path: Path
     train_metric_artifact: Path
     test_metric_artifact: Path
-
 
 @dataclass
 class ModelArtifact:
