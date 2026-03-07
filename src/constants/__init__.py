@@ -1,5 +1,3 @@
-# Constants for Emotion Detection Project
-
 # Image and Model Parameters
 IMG_SIZE = 224
 BATCH_SIZE = 32
@@ -42,3 +40,4 @@ BASE_MODEL = "MobileNetV2"
 DENSE_UNITS = 128
 ACTIVATION = "relu"
 OUTPUT_ACTIVATION = "softmax"
+
