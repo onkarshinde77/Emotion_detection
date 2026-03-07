@@ -7,18 +7,19 @@ NUM_CLASSES = 7
 DATA_DIR = "data"
 TRAIN_DIR = f"{DATA_DIR}/train"
 VALIDATION_DIR = f"{DATA_DIR}/validation"
-MODEL_PATH = "Notebook/emotion_mobilenetv2.h5"
-FACE_CASCADE_PATH = "Notebook/haarcascade_frontalface_default.xml"
+MODEL_PATH = "models/emotion_mobilenetv2.h5"
+FACE_CASCADE_PATH = "models/haarcascade_frontalface_default.xml"
 
-# Emotion Labels
+# Emotion Labels (These MUST match the alphabetical order of data directories)
+# flow_from_directory sorts folders alphabetically: angry, disgust, fear, happy, neutral, sad, surprise
 EMOTION_LABELS = [
     "Angry",
     "Disgust",
     "Fear",
     "Happy",
+    "Neutral",
     "Sad",
-    "Surprise",
-    "Neutral"
+    "Surprise"
 ]
 
 # Training Hyperparameters

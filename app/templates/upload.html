@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image - Emotion Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📸 Image Upload</h1>
+            <p>Upload an image to detect emotions</p>
+        </header>
+
+        <div class="upload-container">
+            <div class="upload-section">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-content">
+                        <div class="upload-icon">📤</div>
+                        <p>Drag & drop an image here or click to browse</p>
+                        <input type="file" id="file-input" accept="image/*" style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                            Choose File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="preview-section" id="preview-section" style="display: none;">
+                    <h3>Selected Image</h3>
+                    <img id="image-preview" alt="Selected image">
+                    <div class="preview-controls">
+                        <button class="btn btn-success" onclick="analyzeImage()">Analyze Emotions</button>
+                        <button class="btn btn-outline" onclick="resetUpload()">Choose Different Image</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section" id="results-section" style="display: none;">
+                <h3>Analysis Results</h3>
+                <div id="results-content">
+                    <!-- Results will be populated here -->
+                </div>
+                <div class="results-controls">
+                    <button class="btn btn-primary" onclick="resetUpload()">Analyze Another Image</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const previewSection = document.getElementById('preview-section');
+        const imagePreview = document.getElementById('image-preview');
+        const resultsSection = document.getElementById('results-section');
+        const resultsContent = document.getElementById('results-content');
+
+        let selectedFile = null;
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                uploadArea.style.display = 'none';
+                previewSection.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetUpload() {
+            selectedFile = null;
+            fileInput.value = '';
+            uploadArea.style.display = 'block';
+            previewSection.style.display = 'none';
+            resultsSection.style.display = 'none';
+            uploadArea.classList.remove('drag-over');
+        }
+
+        async function analyzeImage() {
+            if (!selectedFile) {
+                alert('Please select an image first.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/api/predict_image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayResults(result.results);
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while analyzing the image.');
+            }
+        }
+
+        function displayResults(results) {
+            const faceCount = Object.keys(results).length;
+
+            if (faceCount === 0) {
+                resultsContent.innerHTML = `
+                    <div class="no-results">
+                        <p>❌ No faces detected in the image.</p>
+                        <p>Try uploading an image with clearer faces or better lighting.</p>
+                    </div>
+                `;
+            } else {
+                let html = `<div class="results-summary">
+                    <p>✅ Found ${faceCount} face${faceCount > 1 ? 's' : ''} in the image</p>
+                </div>`;
+
+                html += '<div class="faces-grid">';
+
+                Object.entries(results).forEach(([faceId, data]) => {
+                    const emotion = data.emotion;
+                    const confidence = (data.confidence * 100).toFixed(1);
+                    const coords = data.coordinates;
+
+                    html += `
+                        <div class="face-result">
+                            <div class="face-header">
+                                <h4>${faceId.replace('_', ' ').toUpperCase()}</h4>
+                                <div class="emotion-badge ${emotion.toLowerCase()}">${emotion}</div>
+                            </div>
+                            <div class="face-details">
+                                <p><strong>Confidence:</strong> ${confidence}%</p>
+                                <p><strong>Position:</strong> (${coords.x}, ${coords.y})</p>
+                                <p><strong>Size:</strong> ${coords.width}×${coords.height}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+                resultsContent.innerHTML = html;
+            }
+
+            previewSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

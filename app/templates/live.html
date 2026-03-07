@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Emotion Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>📹 Live Emotion Detection</h1>
+        <p>Real-time emotion recognition from your webcam</p>
+      </header>
+
+      <div class="live-container">
+        <div class="video-section">
+          <h2>Camera Feed</h2>
+          <div class="video-wrapper">
+            <img id="video-feed" src="{{ url_for('live_feed') }}" alt="Live Camera Feed" />
+          </div>
+          <div class="controls">
+            <button id="start-btn" class="btn btn-primary">Start Detection</button>
+            <button id="stop-btn" class="btn btn-danger" disabled>Stop Detection</button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline">Back to Home</a>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h2>How it works</h2>
+          <div class="info-card">
+            <h3>📋 Instructions</h3>
+            <ol>
+              <li>Click "Start Detection" to begin</li>
+              <li>Allow camera access when prompted</li>
+              <li>Position your face in front of the camera</li>
+              <li>The system will detect and label emotions in real-time</li>
+              <li>Click "Stop Detection" to pause</li>
+            </ol>
+          </div>
+
+          <div class="info-card">
+            <h3>🎯 Detection Features</h3>
+            <ul>
+              <li>Real-time face detection</li>
+              <li>7 emotion categories</li>
+              <li>Confidence scores</li>
+              <li>Color-coded labels</li>
+              <li>Multiple face support</li>
+            </ul>
+          </div>
+
+          <div class="info-card">
+            <h3>💡 Tips</h3>
+            <ul>
+              <li>Ensure good lighting</li>
+              <li>Face the camera directly</li>
+              <li>Keep a neutral background</li>
+              <li>Stay within 2-3 feet of camera</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const videoFeed = document.getElementById('video-feed')
+      const startBtn = document.getElementById('start-btn')
+      const stopBtn = document.getElementById('stop-btn')
+      
+      let isRunning = false
+      
+      startBtn.addEventListener('click', function () {
+        if (!isRunning) {
+          videoFeed.src = "{{ url_for('live_feed') }}"
+          startBtn.disabled = true
+          stopBtn.disabled = false
+          isRunning = true
+        }
+      })
+      
+      stopBtn.addEventListener('click', function () {
+        if (isRunning) {
+          videoFeed.src = ''
+          startBtn.disabled = false
+          stopBtn.disabled = true
+          isRunning = false
+        }
+      })
+      
+      // Handle page unload
+      window.addEventListener('beforeunload', function () {
+        if (isRunning) {
+          videoFeed.src = ''
+        }
+      })
+    </script>
+  </body>
+</html>

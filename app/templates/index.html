@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emotion Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🎭 Emotion Detection System</h1>
+        <p>Real-time emotion recognition using AI and computer vision</p>
+      </header>
+
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">📹</div>
+          <h3>Live Camera</h3>
+          <p>Real-time emotion detection using your webcam</p>
+          <a href="{{ url_for('live') }}" class="btn btn-primary">Start Live Detection</a>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📸</div>
+          <h3>Upload Image</h3>
+          <p>Upload photos to detect emotions in images</p>
+          <a href="{{ url_for('upload') }}" class="btn btn-secondary">Upload Image</a>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>API Access</h3>
+          <p>Integrate emotion detection into your applications</p>
+          <a href="/api/health" class="btn btn-outline" target="_blank">API Docs</a>
+        </div>
+      </div>
+
+      <div class="emotions-info">
+        <h2>Supported Emotions</h2>
+        <div class="emotions-grid">
+          <div class="emotion-item">
+            <div class="emotion-color angry"></div>
+            <span>Angry</span>
+          </div>
+          <div class="emotion-item">
+            <div class="emotion-color disgust"></div>
+            <span>Disgust</span>
+          </div>
+          <div class="emotion-item">
+            <div class="emotion-color fear"></div>
+            <span>Fear</span>
+          </div>
+          <div class="emotion-item">
+            <div class="emotion-color happy"></div>
+            <span>Happy</span>
+          </div>
+          <div class="emotion-item">
+            <div class="emotion-color neutral"></div>
+            <span>Neutral</span>
+          </div>
+          <div class="emotion-item">
+            <div class="emotion-color sad"></div>
+            <span>Sad</span>
+          </div>
+          <div class="emotion-item">
+            <div class="emotion-color surprise"></div>
+            <span>Surprise</span>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>&copy; 2024 Emotion Detection System. Built with Flask and TensorFlow.</p>
+      </footer>
+    </div>
+  </body>
+</html>
