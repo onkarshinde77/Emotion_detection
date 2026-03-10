@@ -8,7 +8,6 @@ import time
 
 from src.logging.logger import logging
 from src.pipelines.predict_pipeline import PredictPipeline
-from src.constants import MODEL_PATH, FACE_CASCADE_PATH
 
 app = Flask(__name__)
 # Initialize prediction pipeline

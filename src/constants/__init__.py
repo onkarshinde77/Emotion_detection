@@ -7,7 +7,7 @@ NUM_CLASSES = 7
 DATA_DIR = "data"
 TRAIN_DIR = f"{DATA_DIR}/train"
 VALIDATION_DIR = f"{DATA_DIR}/validation"
-MODEL_PATH = "models/emotion_mobilenetv2.h5"
+MODEL_PATH = "artifacts/model_trainer/emotion_mobilenetv2_trained.h5"
 FACE_CASCADE_PATH = "models/haarcascade_frontalface_default.xml"
 
 # Emotion Labels (These MUST match the alphabetical order of data directories)
