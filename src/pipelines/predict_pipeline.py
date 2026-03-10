@@ -8,9 +8,6 @@ from src.constants import (
     FACE_CASCADE_PATH, SCALE_FACTOR, MIN_NEIGHBORS
 )
 
-logger = logging.getLogger(__name__)
-
-
 class PredictPipeline:
     def __init__(self, model_path: str = MODEL_PATH, 
                  face_cascade_path: str = FACE_CASCADE_PATH):
@@ -41,28 +38,28 @@ class PredictPipeline:
     def load_model(self) -> bool:
         """Load the trained emotion detection model"""
         try:
-            logger.info(f"Loading model from {self.model_path}")
+            logging.info(f"Loading model from {self.model_path}")
             self.model = tf.keras.models.load_model(str(self.model_path))
-            logger.info("Model loaded successfully")
+            logging.info("Model loaded successfully")
             return True
         except Exception as e:
-            logger.error(f"Error loading model: {str(e)}")
+            logging.error(f"Error loading model: {str(e)}")
             return False
 
     def load_face_cascade(self) -> bool:
         """Load the Haar Cascade classifier for face detection"""
         try:
-            logger.info(f"Loading face cascade from {self.face_cascade_path}")
+            logging.info(f"Loading face cascade from {self.face_cascade_path}")
             self.face_cascade = cv2.CascadeClassifier(str(self.face_cascade_path))
             
             if self.face_cascade.empty():
-                logger.error("Failed to load face cascade classifier")
+                logging.error("Failed to load face cascade classifier")
                 return False
             
-            logger.info("Face cascade loaded successfully")
+            logging.info("Face cascade loaded successfully")
             return True
         except Exception as e:
-            logger.error(f"Error loading face cascade: {str(e)}")
+            logging.error(f"Error loading face cascade: {str(e)}")
             return False
 
     def preprocess_face(self, face: np.ndarray) -> np.ndarray:
@@ -87,7 +84,7 @@ class PredictPipeline:
             
             return face
         except Exception as e:
-            logger.error(f"Error preprocessing face: {str(e)}")
+            logging.error(f"Error preprocessing face: {str(e)}")
             return None
 
     def predict_emotion(self, face: np.ndarray) -> tuple:
@@ -115,7 +112,7 @@ class PredictPipeline:
             
             return emotion, confidence
         except Exception as e:
-            logger.error(f"Error predicting emotion: {str(e)}")
+            logging.error(f"Error predicting emotion: {str(e)}")
             return "Unknown", 0.0
 
     def run_live_camera(self, camera_id: int = 0, display_confidence: bool = True):
@@ -129,28 +126,28 @@ class PredictPipeline:
         try:
             # Load model and face cascade
             if not self.load_model():
-                logger.error("Failed to load model. Exiting.")
+                logging.error("Failed to load model. Exiting.")
                 return
             
             if not self.load_face_cascade():
-                logger.error("Failed to load face cascade. Exiting.")
+                logging.error("Failed to load face cascade. Exiting.")
                 return
             
-            logger.info("Starting live camera prediction")
-            logger.info("Press 'q' to quit")
+            logging.info("Starting live camera prediction")
+            logging.info("Press 'q' to quit")
             
             # Start video capture
             cap = cv2.VideoCapture(camera_id)
             
             if not cap.isOpened():
-                logger.error(f"Failed to open camera {camera_id}")
+                logging.error(f"Failed to open camera {camera_id}")
                 return
             
             while True:
                 ret, frame = cap.read()
                 
                 if not ret:
-                    logger.error("Failed to read frame from camera")
+                    logging.error("Failed to read frame from camera")
                     break
                 
                 # Convert to grayscale for face detection
@@ -209,16 +206,16 @@ class PredictPipeline:
                 
                 # Check for quit command
                 if cv2.waitKey(1) & 0xFF == ord('q'):
-                    logger.info("Quitting live camera prediction")
+                    logging.info("Quitting live camera prediction")
                     break
             
             # Release resources
             cap.release()
             cv2.destroyAllWindows()
-            logger.info("Live camera prediction ended")
+            logging.info("Live camera prediction ended")
             
         except Exception as e:
-            logger.error(f"Error in live camera prediction: {str(e)}")
+            logging.error(f"Error in live camera prediction: {str(e)}")
             raise e
 
     def predict_image_from_array(self, image_array: np.ndarray) -> dict:
@@ -234,14 +231,14 @@ class PredictPipeline:
         try:
             # Load model and face cascade if not loaded
             if not self.load_model():
-                logger.error("Failed to load model")
+                logging.error("Failed to load model")
                 return {}
             
             if not self.load_face_cascade():
-                logger.error("Failed to load face cascade")
+                logging.error("Failed to load face cascade")
                 return {}
             
-            logger.info("Processing image array")
+            logging.info("Processing image array")
             
             # Convert to grayscale for face detection
             gray = cv2.cvtColor(image_array, cv2.COLOR_BGR2GRAY)
@@ -272,11 +269,11 @@ class PredictPipeline:
                     }
                 }
             
-            logger.info(f"Found {len(faces)} face(s) in image")
+            logging.info(f"Found {len(faces)} face(s) in image")
             return results
             
         except Exception as e:
-            logger.error(f"Error predicting image array: {str(e)}")
+            logging.error(f"Error predicting image array: {str(e)}")
             return {}
 
     def process_frame_for_display(self, frame: np.ndarray) -> np.ndarray:
@@ -336,7 +333,7 @@ class PredictPipeline:
             return frame
             
         except Exception as e:
-            logger.error(f"Error processing frame: {str(e)}")
+            logging.error(f"Error processing frame: {str(e)}")
             return frame
 
 

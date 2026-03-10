@@ -1,6 +1,6 @@
 import os
-import logging
 import json
+import logging
 from pathlib import Path
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -11,7 +11,6 @@ from src.constants import (
     ROTATION_RANGE, ZOOM_RANGE, HORIZONTAL_FLIP
 )
 
-logger = logging.getLogger(__name__)
 
 
 class ModelTrainer:
@@ -21,7 +20,7 @@ class ModelTrainer:
     def create_data_generators(self):
         """Create image data generators for training and validation"""
         try:
-            logger.info("Creating data generators")
+            logging.info("Creating data generators")
             
             # Training data augmentation
             train_datagen = ImageDataGenerator(
@@ -49,31 +48,31 @@ class ModelTrainer:
                 class_mode='categorical'
             )
             
-            logger.info("Data generators created successfully")
+            logging.info("Data generators created successfully")
             return train_generator, val_generator
             
         except Exception as e:
-            logger.error(f"Error creating data generators: {str(e)}")
+            logging.error(f"Error creating data generators: {str(e)}")
             raise e
 
     def load_base_model(self):
         """Load the base model for training"""
         try:
-            logger.info(f"Loading base model from {self.config.base_model_path}")
+            logging.info(f"Loading base model from {self.config.base_model_path}")
             
             model = tf.keras.models.load_model(str(self.config.base_model_path))
             
-            logger.info("Base model loaded successfully")
+            logging.info("Base model loaded successfully")
             return model
             
         except Exception as e:
-            logger.error(f"Error loading base model: {str(e)}")
+            logging.error(f"Error loading base model: {str(e)}")
             raise e
 
     def train_model(self, model, train_generator, val_generator):
         """Train the model"""
         try:
-            logger.info(f"Starting model training for {self.config.params_epochs} epochs")
+            logging.info(f"Starting model training for {self.config.params_epochs} epochs")
             
             # Compile model with training parameters
             model.compile(
@@ -90,11 +89,11 @@ class ModelTrainer:
                 verbose=1
             )
             
-            logger.info("Model training completed successfully")
+            logging.info("Model training completed successfully")
             return history
             
         except Exception as e:
-            logger.error(f"Error training model: {str(e)}")
+            logging.error(f"Error training model: {str(e)}")
             raise e
 
     def save_model(self, model, model_path):
@@ -102,9 +101,9 @@ class ModelTrainer:
         try:
             os.makedirs(os.path.dirname(model_path), exist_ok=True)
             model.save(model_path)
-            logger.info(f"Trained model saved to {model_path}")
+            logging.info(f"Trained model saved to {model_path}")
         except Exception as e:
-            logger.error(f"Error saving model: {str(e)}")
+            logging.error(f"Error saving model: {str(e)}")
             raise e
 
     def save_training_metrics(self, history, metrics_path):
@@ -120,16 +119,16 @@ class ModelTrainer:
             with open(metrics_path, 'w') as f:
                 json.dump(metrics, f, indent=4)
             
-            logger.info(f"Training metrics saved to {metrics_path}")
+            logging.info(f"Training metrics saved to {metrics_path}")
             
         except Exception as e:
-            logger.error(f"Error saving training metrics: {str(e)}")
+            logging.error(f"Error saving training metrics: {str(e)}")
             raise e
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         """Initiate the complete model training process"""
         try:
-            logger.info("Initiating model trainer")
+            logging.info("Initiating model trainer")
             
             # Create root directory
             os.makedirs(self.config.root_dir, exist_ok=True)
@@ -162,9 +161,9 @@ class ModelTrainer:
                 test_metric_artifact=Path(test_metrics_path)
             )
             
-            logger.info(f"Model Trainer Artifact: {artifact}")
+            logging.info(f"Model Trainer Artifact: {artifact}")
             return artifact
             
         except Exception as e:
-            logger.error(f"Error in model trainer: {str(e)}")
+            logging.error(f"Error in model trainer: {str(e)}")
             raise e

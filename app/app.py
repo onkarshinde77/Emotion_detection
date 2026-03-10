@@ -1,23 +1,16 @@
 from flask import Flask, render_template, request, jsonify, Response
-import logging
 import cv2
 import numpy as np
 import tensorflow as tf
-from pathlib import Path
-import base64
 import io
 from PIL import Image
 import time
 
+from src.logging.logger import logging
 from src.pipelines.predict_pipeline import PredictPipeline
 from src.constants import MODEL_PATH, FACE_CASCADE_PATH
 
 app = Flask(__name__)
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 # Initialize prediction pipeline
 predict_pipeline = PredictPipeline()
 
@@ -67,7 +60,7 @@ def predict_image():
         })
 
     except Exception as e:
-        logger.error(f"Error in predict_image: {str(e)}")
+        logging.error(f"Error in predict_image: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/live_feed')
@@ -81,18 +74,18 @@ def generate_frames():
     try:
         # Load model and face cascade
         if not predict_pipeline.load_model():
-            logger.error("Failed to load model")
+            logging.error("Failed to load model")
             return
 
         if not predict_pipeline.load_face_cascade():
-            logger.error("Failed to load face cascade")
+            logging.error("Failed to load face cascade")
             return
 
         # Start video capture
         cap = cv2.VideoCapture(0)
 
         if not cap.isOpened():
-            logger.error("Failed to open camera")
+            logging.error("Failed to open camera")
             return
 
         while True:
@@ -118,7 +111,7 @@ def generate_frames():
         cap.release()
 
     except Exception as e:
-        logger.error(f"Error in generate_frames: {str(e)}")
+        logging.error(f"Error in generate_frames: {str(e)}")
 
 @app.route('/api/health')
 def health_check():

@@ -1,15 +1,12 @@
 import os
-import logging
 import json
+import logging
 from pathlib import Path
 from typing import Dict, List
 import cv2
 from src.entity.config_entity import DataValidationConfig
 from src.entity.artifact_entity import DataValidationArtifact
 from src.constants import EMOTION_LABELS
-
-logger = logging.getLogger(__name__)
-
 
 class DataValidation:
     def __init__(self, config: DataValidationConfig):
@@ -18,11 +15,11 @@ class DataValidation:
     def validate_data_files(self) -> bool:
         """Validate if all required data files and directories exist"""
         try:
-            logger.info("Validating data files and directories")
+            logging.info("Validating data files and directories")
             
             # Check if data directories exist
             if not os.path.exists(self.config.unzip_data_dir):
-                logger.error(f"Data directory not found: {self.config.unzip_data_dir}")
+                logging.error(f"Data directory not found: {self.config.unzip_data_dir}")
                 return False
             
             # Check for train and validation directories
@@ -30,23 +27,23 @@ class DataValidation:
             val_dir = os.path.join(self.config.unzip_data_dir, "validation")
             
             if not os.path.exists(train_dir):
-                logger.error(f"Train directory not found: {train_dir}")
+                logging.error(f"Train directory not found: {train_dir}")
                 return False
             
             if not os.path.exists(val_dir):
-                logger.error(f"Validation directory not found: {val_dir}")
+                logging.error(f"Validation directory not found: {val_dir}")
                 return False
             
-            logger.info("Data directories validated successfully")
+            logging.info("Data directories validated successfully")
             return True
         except Exception as e:
-            logger.error(f"Error validating data files: {str(e)}")
+            logging.error(f"Error validating data files: {str(e)}")
             return False
 
     def validate_schema(self) -> bool:
         """Validate if all required emotion directories exist in train and validation"""
         try:
-            logger.info("Validating data schema")
+            logging.info("Validating data schema")
             
             train_dir = os.path.join(self.config.unzip_data_dir, "train")
             val_dir = os.path.join(self.config.unzip_data_dir, "validation")
@@ -57,20 +54,20 @@ class DataValidation:
             
             missing_train = required_emotions - train_emotions
             if missing_train:
-                logger.error(f"Missing emotion folders in train: {missing_train}")
+                logging.error(f"Missing emotion folders in train: {missing_train}")
                 return False
             
             # Check if all emotion folders exist in validation
             val_emotions = set(os.listdir(val_dir))
             missing_val = required_emotions - val_emotions
             if missing_val:
-                logger.error(f"Missing emotion folders in validation: {missing_val}")
+                logging.error(f"Missing emotion folders in validation: {missing_val}")
                 return False
             
-            logger.info("Data schema validated successfully")
+            logging.info("Data schema validated successfully")
             return True
         except Exception as e:
-            logger.error(f"Error validating schema: {str(e)}")
+            logging.error(f"Error validating schema: {str(e)}")
             return False
 
     def is_valid_image(self, file_path: str) -> bool:
@@ -81,13 +78,13 @@ class DataValidation:
                 return False
             return True
         except Exception as e:
-            logger.error(f"Error reading image {file_path}: {str(e)}")
+            logging.error(f"Error reading image {file_path}: {str(e)}")
             return False
 
     def validate_image_quality(self) -> Dict[str, List[str]]:
         """Validate image quality and return invalid image paths"""
         try:
-            logger.info("Validating image quality")
+            logging.info("Validating image quality")
             invalid_images = {"train": [], "validation": []}
             
             train_dir = os.path.join(self.config.unzip_data_dir, "train")
@@ -111,21 +108,18 @@ class DataValidation:
                         if not self.is_valid_image(image_path):
                             invalid_images["validation"].append(image_path)
             
-            logger.info(f"Invalid train images: {len(invalid_images['train'])}")
-            logger.info(f"Invalid validation images: {len(invalid_images['validation'])}")
+            logging.info(f"Invalid train images: {len(invalid_images['train'])}")
+            logging.info(f"Invalid validation images: {len(invalid_images['validation'])}")
             
             return invalid_images
         except Exception as e:
-            logger.error(f"Error validating image quality: {str(e)}")
+            logging.error(f"Error validating image quality: {str(e)}")
             return {"train": [], "validation": []}
 
     def initiate_data_validation(self) -> DataValidationArtifact:
         """Initiate complete data validation process"""
         try:
-            logger.info("Starting data validation")
-            
-            # Create root directory if it doesn't exist
-            os.makedirs(self.config.root_dir, exist_ok=True)
+            logging.info("Starting data validation")
             
             # Validate files exist
             files_valid = self.validate_data_files()
@@ -159,32 +153,21 @@ class DataValidation:
             with open(drift_report_path, 'w') as f:
                 json.dump(drift_report, f, indent=4)
             
-            logger.info(f"Validation report saved to {drift_report_path}")
+            logging.info(f"Validation report saved to {drift_report_path}")
             
-            # Create valid and invalid data directories
-            valid_train_path = os.path.join(self.config.root_dir, "valid_train")
-            invalid_train_path = os.path.join(self.config.root_dir, "invalid_train")
-            valid_val_path = os.path.join(self.config.root_dir, "valid_validation")
-            invalid_val_path = os.path.join(self.config.root_dir, "invalid_validation")
-            
-            os.makedirs(valid_train_path, exist_ok=True)
-            os.makedirs(invalid_train_path, exist_ok=True)
-            os.makedirs(valid_val_path, exist_ok=True)
-            os.makedirs(invalid_val_path, exist_ok=True)
-            
-            # Return artifact
+            # Return artifact (use existing data directories)
             artifact = DataValidationArtifact(
                 validation_status=validation_status,
-                valid_train_file_path=Path(valid_train_path),
-                valid_test_file_path=Path(valid_val_path),
-                invalid_train_file_path=Path(invalid_train_path),
-                invalid_test_file_path=Path(invalid_val_path),
+                valid_train_file_path=Path(self.config.unzip_data_dir) / "train",
+                valid_test_file_path=Path(self.config.unzip_data_dir) / "validation",
+                invalid_train_file_path=Path(""),  # Not used
+                invalid_test_file_path=Path(""),  # Not used
                 drift_report_file_path=Path(drift_report_path)
             )
             
-            logger.info(f"Data Validation Artifact: {artifact}")
+            logging.info("Data Validation completed successfully")
             return artifact
             
         except Exception as e:
-            logger.error(f"Error in data validation: {str(e)}")
+            logging.error(f"Error in data validation: {str(e)}")
             raise e

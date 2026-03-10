@@ -12,8 +12,6 @@ from src.constants import (
     ACTIVATION, OUTPUT_ACTIVATION
 )
 
-logger = logging.getLogger(__name__)
-
 class ModelBuilder:
     def __init__(self, config: ModelConfig):
         self.config = config
@@ -21,7 +19,7 @@ class ModelBuilder:
     def build_model(self) -> Model:
         """Build the emotion detection model using MobileNetV2"""
         try:
-            logger.info("Building emotion detection model")
+            logging.info("Building emotion detection model")
             
             # Load Pretrained MobileNetV2
             base_model = MobileNetV2(
@@ -31,12 +29,12 @@ class ModelBuilder:
             )
             
             # Freeze base layers
-            logger.info("Freezing base model layers")
+            logging.info("Freezing base model layers")
             for layer in base_model.layers:
                 layer.trainable = False
             
             # Custom classifier
-            logger.info("Building custom classifier layers")
+            logging.info("Building custom classifier layers")
             x = base_model.output
             x = GlobalAveragePooling2D()(x)
             x = Dense(DENSE_UNITS, activation=ACTIVATION)(x)
@@ -46,17 +44,17 @@ class ModelBuilder:
             
             model = Model(inputs=base_model.input, outputs=predictions)
             
-            logger.info("Model built successfully")
+            logging.info("Model built successfully")
             return model
             
         except Exception as e:
-            logger.error(f"Error building model: {str(e)}")
+            logging.error(f"Error building model: {str(e)}")
             raise e
 
     def compile_model(self, model: Model) -> Model:
         """Compile the model"""
         try:
-            logger.info("Compiling model")
+            logging.info("Compiling model")
             
             model.compile(
                 optimizer=tf.keras.optimizers.Adam(learning_rate=self.config.params_learning_rate),
@@ -64,11 +62,11 @@ class ModelBuilder:
                 metrics=['accuracy']
             )
             
-            logger.info("Model compiled successfully")
+            logging.info("Model compiled successfully")
             return model
             
         except Exception as e:
-            logger.error(f"Error compiling model: {str(e)}")
+            logging.error(f"Error compiling model: {str(e)}")
             raise e
 
     def save_model(self, model: Model, model_path: str) -> None:
@@ -76,15 +74,15 @@ class ModelBuilder:
         try:
             os.makedirs(os.path.dirname(model_path), exist_ok=True)
             model.save(model_path)
-            logger.info(f"Model saved to {model_path}")
+            logging.info(f"Model saved to {model_path}")
         except Exception as e:
-            logger.error(f"Error saving model: {str(e)}")
+            logging.error(f"Error saving model: {str(e)}")
             raise e
 
     def initiate_model_builder(self) -> ModelArtifact:
         """Build and save the model"""
         try:
-            logger.info("Initiating model builder")
+            logging.info("Initiating model builder")
             
             # Build model
             model = self.build_model()
@@ -105,9 +103,9 @@ class ModelBuilder:
                 model_history_file_path=Path(self.config.root_dir)
             )
             
-            logger.info(f"Model Builder Artifact: {artifact}")
+            logging.info(f"Model Builder Artifact: {artifact}")
             return artifact
             
         except Exception as e:
-            logger.error(f"Error in model builder: {str(e)}")
+            logging.error(f"Error in model builder: {str(e)}")
             raise e
